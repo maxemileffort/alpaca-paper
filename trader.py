@@ -218,8 +218,16 @@ def main_menu():
         main_menu()
 
 def monitor_positions():
+    # monitor by using a scale trade method. 
+    # the desired logic would create a buy order at the current price,
+    # then create the corresponding sell order a prescribed distance away, 
+    # based on the strategy chosen (a feature being implemented later).
+    # it creates another buy order when the sell order fills, ad nauseum, 
+    # although this function stops after 1000 times. 
+    # currently, it does not create more than 1 buy order at a time.
+
     x = 0 # used for getting the correct number of symbols to monitor
-    y = 0 # used for getting to 1000 daily trades
+    trade_counter = 0 # used for getting to 1000 daily trades
     print("Type 'quit' at anytime to quit or 'main menu' to go back to the menu. ")
     num_to_monitor = input('How many positions would you like to monitor?  ')
     if num_to_monitor == 'quit':
@@ -246,7 +254,7 @@ def monitor_positions():
                 x+=1
 
         print(sym_to_monitor)
-        while y < 1000:
+        while trade_counter < 1000:
             for symbol in sym_to_monitor:
                 time.sleep(1) # rate limiter 
                 check = check_positions_by_symbol(symbol)
@@ -263,8 +271,8 @@ def monitor_positions():
                         time.sleep(1) # rate limiter 
                         delete_position_by_symbol(symbol)
                         print("Closed position for {}".format(symbol))
-                        y+=1
-                        if y <= 1000-len(sym_to_monitor):
+                        trade_counter+=1
+                        if trade_counter <= 1000-len(sym_to_monitor):
                             time.sleep(1) # rate limiter 
                             create_order(symbol, '10', 'buy', 'market', 'gtc')
         return
